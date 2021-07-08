@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+
+
+<body>
+
+<div class="layui-form">
+    <div class="layui-form-item" style="margin-top: 20px">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="start_date" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">结束时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="end_date" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <select id="select_pkg_name" autocomplete="off">
+                <option value="031">方块棋士团_Android</option>
+                <option value="020">方块棋士团_ios</option>
+                <option value="029">迷你战争安卓-主包</option>
+                <option value="010">迷你战争安卓-子包</option>
+                <option value="011">等我去喊人-android</option>
+                <option value="035">等我去喊人-ios</option>
+                <option value="012">小兵-老大你先上</option>
+                <option value="015">小兵-小兵冲冲冲</option>
+                <option value="016">小兵-一起来打架</option>
+                <option value="013">我攻城贼溜</option>
+                <option value="017">造个船吧安卓</option>
+                <option value="019">小兵别打我</option>
+                <option value="021">少侠别打我安卓</option>
+                <option value="022">董小姐的十段恋爱-ios</option>
+                <option value="023">董小姐的十段恋爱-Android</option>
+                <option value="024">董小姐的十段恋爱-Android-taptap</option>
+                <option value="025">魔物调查者-ios</option>
+                <option value="018">别踩我的鞋_android</option>
+                <option value="026">别踩我的鞋_ios</option>
+                <option value="027">看我横着走-ios</option>
+                <option value="028">一拳大侠-ios</option>
+                <option value="030">别踩我的鞋_安卓马甲_android</option>
+                <option value="032">我要去偷家安卓主包</option>
+                <option value="014">我要去偷家安卓马甲子包</option>
+                <option value="033">我要去偷家安卓马甲-PVP</option>
+                <option value="034">我要去偷家-ios</option>
+                <option value="036">最强神兽-ios</option>
+            </select>
+        </div>
+
+        <div class="layui-inline">
+            <button class="btn layui-btn" onclick="reLoad()">查询</button>
+        </div>
+
+    </div>
+</div>
+
+<table class="layui-hide" id="table"></table>
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script>
+    // 日期标签
+    function getDate(day) {
+        date = new Date();
+        date.setDate(date.getDate() + day);
+        myyear = date.getFullYear();
+        mymonth = date.getMonth() + 1;
+        myweekday = date.getDate();
+
+        if (mymonth < 10) {
+            mymonth = "0" + mymonth;
+        }
+        if (myweekday < 10) {
+            myweekday = "0" + myweekday;
+        }
+        return (myyear + "-" + mymonth + "-" + myweekday);
+    }
+
+    start = document.getElementById("start_date");
+    start.value = getDate(-20);
+    end = document.getElementById("end_date");
+    end.value = getDate(0);
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#start_date' //指定元素
+        });
+    });
+
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end_date' //指定元素
+        });
+    });
+
+    // 包
+    selectpkgName = document.getElementById("select_pkg_name");
+    selectpkgName.onchange = function () {
+        selectpkgName.selectedIndex = this.selectedIndex
+        console.log(this.options[this.selectedIndex].innerHTML);
+    }
+
+    function reLoad() {
+        pkgName = selectpkgName.options[selectpkgName.selectedIndex].text
+        layui.table.render({
+            elem: '#table'
+            , url: '/report/day/pkg/list'
+            , where: {
+                "startDate": start.value
+                , "endDate": end.value
+                , "pkgName": pkgName
+            }
+            , page: {
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                , groups: 10 //只显示 10 个连续页码
+                , limit: 20
+            }
+            , limits: [20, 30, 40, 50, 100]
+            , height: 768
+            , cellMinWidth: 120
+            , cols: [
+                [
+                    {field: 'dataDate', title: '日期', sort: true, fixed: 'left', width: 120}
+                    // , {field: 'pkgCode', title: '包名', sort: true, fixed: 'left', width: 120}
+                    , {field: 'pkgName', title: '游戏', sort: true, fixed: 'left', width: 160}
+                    , {field: 'addUserCount', title: '新增', sort: true}
+                    , {field: 'activeUserCount', title: '活跃人数', sort: true}
+                    , {field: 'addUserCountEachActiveUserCount', title: '新增占比', sort: true}
+                    , {field: 'addUserCountEachActiveUserCount', title: '新增占比', sort: true}
+                    , {field: 'retain1', title: '次日留存', sort: true}
+                    , {field: 'retain2', title: '2日留存', sort: true}
+                    , {field: 'retain3', title: '3日留存', sort: true}
+                    , {field: 'retain4', title: '4日留存', sort: true}
+                    , {field: 'retain5', title: '5日留存', sort: true}
+                    , {field: 'retain6', title: '6日留存', sort: true}
+                    , {field: 'retain7', title: '7日留存', sort: true}
+                    , {field: 'retain15', title: '15日留存', sort: true}
+                    , {field: 'retain30', title: '30日留存', sort: true}
+                    , {field: 'addAdShowCountEachAddAdShowEserCount', title: '新用户人均广告次数', sort: true}
+                    , {field: 'adShowCountEachAdShowEserCount', title: '全用户人均广告次数', sort: true}
+                    , {field: 'apiRevenue', title: '穿山甲收入', sort: true}
+                    , {field: 'apiRevenueAll', title: '昨日累计收入', sort: true}
+                    , {field: 'revenue', title: '今日预计收入', sort: true}
+                    , {field: 'apiRevenueRevenueAll', title: '累计收入', sort: true}
+                    , {field: 'apiImpCnt', title: '穿山甲广告次数', sort: true}
+                    , {field: 'ecpm', title: '穿山甲ecpm', sort: true}
+                    , {field: 'addEcpm', title: '数数新用户ecpm', sort: true}
+                    , {field: 'activeArpu', title: '活跃arpu', sort: true}
+                    , {field: 'ltv0', title: '新用户arpu', sort: true}
+                    , {field: 'ltv1', title: '1日ltv', sort: true}
+                    , {field: 'ltv2', title: '2日ltv', sort: true}
+                    , {field: 'ltv3', title: '3日ltv', sort: true}
+                    , {field: 'ltv4', title: '4日ltv', sort: true}
+                    , {field: 'ltv5', title: '5日ltv', sort: true}
+                    , {field: 'ltv6', title: '6日ltv', sort: true}
+                    , {field: 'ltv7', title: '7日ltv', sort: true}
+                    , {field: 'ltv15', title: '15日ltv', sort: true}
+                    , {field: 'ltv30', title: '30日ltv', sort: true}
+                    , {field: 'rOI', title: '边际ROI', sort: true}
+                    , {field: 'rOIAll', title: '累计ROI', sort: true}
+                    , {field: 'pangleCost', title: '穿山甲消耗', sort: true}
+                    , {field: 'pangleCpa', title: '穿山甲CPA', sort: true}
+                    , {field: 'pangleActive', title: '穿山甲激活用户数', sort: true}
+                    , {field: 'pangleFirstROI', title: '穿山甲首日ROI', sort: true}
+                    , {field: 'siteCost', title: '站内消耗', sort: true}
+                    , {field: 'siteCpa', title: '站内CPA', sort: true}
+                    , {field: 'siteActive', title: '站内激活用户数', sort: true}
+                    , {field: 'siteFirstROI', title: '站内首日ROI', sort: true}
+                    , {field: 'costAll', title: '总消耗', sort: true}
+                    , {field: 'active', title: '激活数', sort: true}
+                    , {field: 'firstROI', title: '首日ROI', sort: true}
+                    , {field: 'updateTime', title: '更新时间', sort: true, width: 160}
+                ]
+            ]
+        });
+    }
+
+    reLoad()
+</script>
+
+</body>
+</html>

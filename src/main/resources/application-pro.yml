@@ -1,0 +1,33 @@
+server:
+  port: 10888
+bootdo:
+  uploadPath: c:/var/uploaded_files/
+  username: admin
+  password: 111111
+logging:
+  level:
+    root: info
+    com.bootdo: debug
+spring:
+  datasource:
+    mysql:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://47.115.141.183:3306/dt_db?useUnicode=true&characterEncoding=utf8
+      username: root
+      password: baoliang
+    dorisdb:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://47.119.183.194:9031/doris_boom
+      username: root
+      password: boom@doris1234
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    timeout: 10000
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 10
+        max-active: 100
+        max-wait: -1

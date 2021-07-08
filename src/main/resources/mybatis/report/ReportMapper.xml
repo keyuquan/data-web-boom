@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.boom.report.dao.ReportDao">
+
+    <select id="listDayPkg" resultType="com.web.boom.report.domain.AppDayPkgKpiDo">
+        select
+        data_date as dataDate
+        ,pkg_code as pkgCode
+        ,pkg_name as pkgName
+        ,add_user_count as addUserCount
+        ,active_user_count as activeUserCount
+        ,concat(ifnull(round(add_user_count*100 /active_user_count,2),0) ,'%') as addUserCountEachActiveUserCount
+        ,concat(ifnull(round(retain_1*100/add_user_count,2),0),'%') retain1
+        ,concat(ifnull(round(retain_2*100/add_user_count,2),0),'%') retain2
+        ,concat(ifnull(round(retain_3*100/add_user_count,2),0),'%') retain3
+        ,concat(ifnull(round(retain_4*100/add_user_count,2),0),'%') retain4
+        ,concat(ifnull(round(retain_5*100/add_user_count,2),0),'%') retain5
+        ,concat(ifnull(round(retain_6*100/add_user_count,2),0),'%') retain6
+        ,concat(ifnull(round(retain_7*100/add_user_count,2),0),'%') retain7
+        ,concat(ifnull(round(retain_15*100/add_user_count,2),0),'%') retain15
+        ,concat(ifnull(round(retain_30*100 /add_user_count,2),0) ,'%') retain30
+        ,ifnull(round(add_ad_show_count /add_ad_show_user_count,2),0) addAdShowCountEachAddAdShowEserCount
+        ,ifnull(round(ad_show_count /ad_show_user_count,2),0) adShowCountEachAdShowEserCount
+        ,api_revenue as apiRevenue
+        ,api_revenue_all as apiRevenueAll
+        ,revenue as revenue
+        ,if(date(now())=data_date ,api_revenue_all+revenue,api_revenue_all) as apiRevenueRevenueAll
+        ,api_imp_cnt as apiImpCnt
+        ,round(api_ecpm,1) as ecpm
+        ,ifnull(round(add_ecpm,2),0) addEcpm
+        ,ifnull(round(api_revenue/active_user_count,2),0) activeArpu
+        ,ifnull(round(ltv_0 /add_user_count,2),0) ltv0
+        ,ifnull(round(ltv_1 /add_user_count,2),0) ltv1
+        ,ifnull(round(ltv_2 /add_user_count,2),0) ltv2
+        ,ifnull(round(ltv_3 /add_user_count,2),0) ltv3
+        ,ifnull(round(ltv_4 /add_user_count,2),0) ltv4
+        ,ifnull(round(ltv_5 /add_user_count,2),0) ltv5
+        ,ifnull(round(ltv_6 /add_user_count,2),0) ltv6
+        ,ifnull(round(ltv_7 /add_user_count,2),0) ltv7
+        ,ifnull(round(ltv_15 /add_user_count,2),0) ltv15
+        ,ifnull(round(ltv_30 /add_user_count,2),0) ltv30
+        ,concat(ifnull(round(api_revenue * 100/cost,2),0),'%') roi
+        ,concat(ifnull(round(api_revenue_all * 100/cost_all,2),0),'%') roiAll
+        ,pangle_cost pangleCost
+        ,ifnull(round(pangle_cost/pangle_active,2),0) pangleCpa
+        ,pangle_active pangleActive
+        ,concat(ifnull(round(pangle_ltv_0 * 100 /pangle_cost,2),0),'%') pangleFirstRoi
+        ,site_cost siteCost
+        ,ifnull(round(site_cost/site_active,2),0) siteCpa
+        ,site_active siteActive
+        ,concat(ifnull(round(site_ltv_0 * 100 /site_cost,2),0),'%') siteFirstRoi
+        ,cost_all costAll
+        ,active active
+        ,concat(ifnull(round(ltv_0 * 100 /cost,2),0),'%') firstRoi
+        ,update_time updateTime
+        from
+        doris_boom.app_day_pkg_kpi
+        <where>
+            <if test="pkgCode != null and pkgCode != ''">and pkg_code = #{pkgCode}</if>
+            <if test="pkgName != null and pkgName != ''">and pkg_name = #{pkgName}</if>
+            <if test="startDate != null and startDate != ''">and data_date between #{startDate} and #{endDate}</if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by data_date desc, pkg_code desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="listDayPkgCount" resultType="int">
+        select count(1) from doris_boom.app_day_pkg_kpi
+        <where>
+            <if test="pkgCode != null and pkgCode != ''">and pkg_code = #{pkgCode}</if>
+            <if test="pkgName != null and pkgName != ''">and pkg_name = #{pkgName}</if>
+            <if test="startDate != null and startDate != ''">and data_date between #{startDate} and #{endDate}</if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+        </choose>
+    </select>
+
+
+</mapper>
